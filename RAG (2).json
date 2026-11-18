@@ -1,0 +1,347 @@
+{
+  "name": "RAG",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -128,
+        1072
+      ],
+      "id": "89a3c902-55f9-4dd1-b0e4-afc2fedc335a",
+      "name": "When chat message received",
+      "webhookId": "9dfaa1e3-6e53-47ba-9605-080099f4ce06"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1k60gVGgHf2lxAdWBdaWOtIU_k4wQ_Hn2",
+          "mode": "list",
+          "cachedResultName": "Apple",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1k60gVGgHf2lxAdWBdaWOtIU_k4wQ_Hn2"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        688,
+        1056
+      ],
+      "id": "eaf93233-c02d-4675-8d8e-e59e0c43ab09",
+      "name": "Google Drive Trigger1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "dGElgykZAM22uz6D",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        944,
+        1056
+      ],
+      "id": "d86c464e-7661-4ded-9651-10861b6ceb38",
+      "name": "Download file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "dGElgykZAM22uz6D",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "n8n",
+          "mode": "list",
+          "cachedResultName": "n8n"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        1216,
+        1056
+      ],
+      "id": "4af021ab-dcc4-4182-93ec-2ee503c07f24",
+      "name": "Pinecone Vector Store2",
+      "credentials": {
+        "pineconeApi": {
+          "id": "8xuNvLFA6OSgKaqs",
+          "name": "PineconeApi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "gemini-embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1216,
+        1312
+      ],
+      "id": "bdff9275-8c9e-40f8-b4ab-6b10c392ea29",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "tThnGr32qg45Lfj0",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        1424,
+        1312
+      ],
+      "id": "84fe5b47-b5fb-4d1c-a612-52d39ec1ca58",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "=Act as a financial specialist working at Apple, with deep expertise in corporate finance, financial analysis, investments, budgeting, and financial decision-making.\nYou will receive a user message formatted as:\n\nYour task is to:\n\nAnalyze the user message.\nDetermine whether external knowledge retrieval is required.\nIf retrieval is needed, call the tool \"KB-RAG\" with a clear and optimized query derived from the user message.\nUse the retrieved results along with your financial expertise to generate an accurate, data-driven, and context-aware response.\nIf no retrieval is needed, answer directly using your financial knowledge.\n\nTool Usage Rules:\n\nTool name: \"KB-RAG\"\nAlways refine the query before calling the tool (focus on key financial intent).\nPrioritize factual accuracy and numerical correctness.\nDo not hallucinate—base answers on retrieved data when available.\nCombine retrieved insights with expert financial reasoning.\n\nOutput Format:\n\nFINAL OUTPUT ORGANIZED MARKDOWM"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        160,
+        1072
+      ],
+      "id": "435b9661-6ed3-4e31-ad30-c1748a96c9f7",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        1296
+      ],
+      "id": "af708f4c-237f-4b0b-9d28-3960b61f4060",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-safeguard-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        96,
+        1296
+      ],
+      "id": "14c2dccb-4ac0-4f8a-94a9-2a8b8a13c30e",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "dNWHkmtmDxDdDTYH",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-2"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        352,
+        1472
+      ],
+      "id": "9a25c745-8557-4722-ac3e-8d932da724d7",
+      "name": "Embeddings Google Gemini2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "EIFv99SoVq2Ph78k",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "=Apple’s financial data showing revenue, expenses, profit, and earnings per share, with breakdowns by products, services, and geographic regions for 2024–2025.",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "n8n",
+          "mode": "list",
+          "cachedResultName": "n8n"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        1296
+      ],
+      "id": "c3d1c6de-c864-46e5-887a-ca2e76968fc8",
+      "name": "KB-RAG1",
+      "credentials": {
+        "pineconeApi": {
+          "id": "8xuNvLFA6OSgKaqs",
+          "name": "PineconeApi account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Download file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file1": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store2",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "KB-RAG1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KB-RAG1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "b7ddc580-3b80-4e39-b3d6-7a0d3b06ac62",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "59dea6252a1d9a81ed22edfa06d7b579cf04899ead2a10b4d7661cfe148039a7"
+  },
+  "id": "LmutlfdjxaF3lwnJ",
+  "tags": []
+}
